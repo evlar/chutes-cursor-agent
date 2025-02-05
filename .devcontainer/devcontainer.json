@@ -1,16 +1,33 @@
 {
-    "name": "temp",
+    "name": "AI Assistant Development",
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
         "ghcr.io/devcontainers/features/python:1": {
             "version": "3.10"
+        },
+        "ghcr.io/devcontainers/features/node:1": {},
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": true,
+            "configureZshAsDefaultShell": true,
+            "installOhMyZsh": true
         }
     },
     "customizations": {
         "vscode": {
-            "extensions": []
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.formatting.provider": "black",
+                "editor.formatOnSave": true
+            }
         }
     },
     "forwardPorts": [8080],
-    "postCreateCommand": "apt-get update"
+    "postCreateCommand": "pip install -r requirements.txt && playwright install chromium",
+    "remoteUser": "vscode"
 }

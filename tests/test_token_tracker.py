@@ -1,175 +1,103 @@
 #!/usr/bin/env python3
 
 import unittest
-from unittest.mock import patch, MagicMock, mock_open
-import json
 import os
-from pathlib import Path
-import time
+import json
+import shutil
 from datetime import datetime
-from tools.token_tracker import TokenTracker, TokenUsage, APIResponse, get_token_tracker, _token_tracker
+from tools.token_tracker import TokenUsage, APIResponse, TokenTracker, get_token_tracker
 
 class TestTokenTracker(unittest.TestCase):
     def setUp(self):
-        # Create a temporary directory for test logs
-        self.test_logs_dir = Path("test_token_logs")
-        self.test_logs_dir.mkdir(exist_ok=True)
+        """Set up test environment"""
+        self.test_logs_dir = "test_logs"
+        if os.path.exists(self.test_logs_dir):
+            shutil.rmtree(self.test_logs_dir)
+        os.makedirs(self.test_logs_dir)
         
-        # Clean up any existing test files
-        for file in self.test_logs_dir.glob("*"):
-            file.unlink()
-        
-        # Reset global token tracker
-        global _token_tracker
-        _token_tracker = None
-        
-        # Create test data
-        self.test_token_usage = TokenUsage(
-            prompt_tokens=100,
-            completion_tokens=50,
-            total_tokens=150,
-            reasoning_tokens=20
-        )
-        
-        self.test_response = APIResponse(
-            content="Test response",
-            token_usage=self.test_token_usage,
-            cost=0.123,
-            thinking_time=1.5,
-            provider="openai",
-            model="o1"
-        )
-        
-        # Create a TokenTracker instance with a unique test session ID
-        self.test_session_id = f"test-{int(time.time())}"
-        self.tracker = TokenTracker(self.test_session_id, logs_dir=self.test_logs_dir)
-        self.tracker.session_file = self.test_logs_dir / f"session_{self.test_session_id}.json"
+        self.tracker = TokenTracker("test-session", logs_dir=self.test_logs_dir)
 
     def tearDown(self):
-        # Clean up test logs directory
-        if self.test_logs_dir.exists():
-            for file in self.test_logs_dir.glob("*"):
-                file.unlink()
-            self.test_logs_dir.rmdir()
-        
-        # Reset global token tracker
-        global _token_tracker
-        _token_tracker = None
+        """Clean up test environment"""
+        if os.path.exists(self.test_logs_dir):
+            shutil.rmtree(self.test_logs_dir)
 
     def test_token_usage_creation(self):
-        """Test TokenUsage dataclass creation"""
-        token_usage = TokenUsage(100, 50, 150, 20)
-        self.assertEqual(token_usage.prompt_tokens, 100)
-        self.assertEqual(token_usage.completion_tokens, 50)
-        self.assertEqual(token_usage.total_tokens, 150)
-        self.assertEqual(token_usage.reasoning_tokens, 20)
+        """Test TokenUsage object creation and properties"""
+        usage = TokenUsage(100, 50, 150, None)
+        self.assertEqual(usage.prompt_tokens, 100)
+        self.assertEqual(usage.completion_tokens, 50)
+        self.assertEqual(usage.total_tokens, 150)
+        self.assertIsNone(usage.reasoning_tokens)
 
     def test_api_response_creation(self):
-        """Test APIResponse dataclass creation"""
+        """Test APIResponse object creation and properties"""
+        usage = TokenUsage(100, 50, 150, None)
         response = APIResponse(
-            content="Test",
-            token_usage=self.test_token_usage,
+            content="Test response",
+            token_usage=usage,
             cost=0.1,
             thinking_time=1.0,
-            provider="openai",
-            model="o1"
+            provider="chutes",
+            model="deepseek-ai/DeepSeek-R1"
         )
-        self.assertEqual(response.content, "Test")
-        self.assertEqual(response.token_usage, self.test_token_usage)
+        
+        self.assertEqual(response.content, "Test response")
+        self.assertEqual(response.token_usage, usage)
         self.assertEqual(response.cost, 0.1)
         self.assertEqual(response.thinking_time, 1.0)
-        self.assertEqual(response.provider, "openai")
-        self.assertEqual(response.model, "o1")
+        self.assertEqual(response.provider, "chutes")
+        self.assertEqual(response.model, "deepseek-ai/DeepSeek-R1")
 
-    def test_openai_cost_calculation(self):
-        """Test OpenAI cost calculation for supported models"""
-        # Test o1 model pricing
-        cost = TokenTracker.calculate_openai_cost(1000000, 500000, "o1")
-        self.assertEqual(cost, 15.0 + 30.0)  # $15/M input + $60/M output
+    def test_track_request(self):
+        """Test tracking individual requests"""
+        response = APIResponse(
+            content="Test response",
+            token_usage=TokenUsage(100, 50, 150, None),
+            cost=0.1,
+            thinking_time=1.0,
+            provider="chutes",
+            model="deepseek-ai/DeepSeek-R1"
+        )
         
-        # Test gpt-4o model pricing
-        cost = TokenTracker.calculate_openai_cost(1000000, 500000, "gpt-4o")
-        self.assertEqual(cost, 10.0 + 15.0)  # $10/M input + $30/M output
+        self.tracker.track_request(response)
         
-        # Test unsupported model
-        with self.assertRaises(ValueError):
-            TokenTracker.calculate_openai_cost(1000000, 500000, "gpt-4")
+        # Verify log file exists and contains correct data
+        log_files = os.listdir(self.test_logs_dir)
+        self.assertEqual(len(log_files), 1)
+        
+        log_path = os.path.join(self.test_logs_dir, log_files[0])
+        with open(log_path, 'r') as f:
+            log_data = json.load(f)
+            
+        self.assertEqual(len(log_data), 1)
+        entry = log_data[0]
+        self.assertEqual(entry["content"], "Test response")
+        self.assertEqual(entry["token_usage"]["prompt_tokens"], 100)
+        self.assertEqual(entry["token_usage"]["completion_tokens"], 50)
+        self.assertEqual(entry["token_usage"]["total_tokens"], 150)
+        self.assertEqual(entry["cost"], 0.1)
+        self.assertEqual(entry["provider"], "chutes")
+        self.assertEqual(entry["model"], "deepseek-ai/DeepSeek-R1")
 
-    def test_claude_cost_calculation(self):
-        """Test Claude cost calculation"""
-        cost = TokenTracker.calculate_claude_cost(1000000, 500000, "claude-3-sonnet-20240229")
-        self.assertEqual(cost, 3.0 + 7.5)  # $3/M input + $15/M output
-
-    def test_per_day_session_management(self):
-        """Test per-day session management"""
-        # Track a request
-        self.tracker.track_request(self.test_response)
-        
-        # Verify file was created
-        session_file = self.test_logs_dir / f"session_{self.test_session_id}.json"
-        self.assertTrue(session_file.exists())
-        
-        # Load and verify file contents
-        with open(session_file) as f:
-            data = json.load(f)
-            self.assertEqual(data["session_id"], self.test_session_id)
-            self.assertEqual(len(data["requests"]), 1)
-            self.assertEqual(data["requests"][0]["provider"], "openai")
-            self.assertEqual(data["requests"][0]["model"], "o1")
-
-    def test_session_file_loading(self):
-        """Test loading existing session file"""
-        # Create a test session file
-        session_file = self.test_logs_dir / f"session_{self.test_session_id}.json"
-        test_data = {
-            "session_id": self.test_session_id,
-            "start_time": time.time(),
-            "requests": [
-                {
-                    "timestamp": time.time(),
-                    "provider": "openai",
-                    "model": "o1",
-                    "token_usage": {
-                        "prompt_tokens": 100,
-                        "completion_tokens": 50,
-                        "total_tokens": 150,
-                        "reasoning_tokens": 20
-                    },
-                    "cost": 0.123,
-                    "thinking_time": 1.5
-                }
-            ]
-        }
-        with open(session_file, "w") as f:
-            json.dump(test_data, f)
-        
-        # Create a new tracker - it should load the existing file
-        new_tracker = TokenTracker(self.test_session_id)
-        new_tracker.logs_dir = self.test_logs_dir
-        new_tracker.session_file = self.test_logs_dir / f"session_{self.test_session_id}.json"
-        self.assertEqual(len(new_tracker.requests), 1)
-        self.assertEqual(new_tracker.requests[0]["provider"], "openai")
-        self.assertEqual(new_tracker.requests[0]["model"], "o1")
-
-    def test_session_summary_calculation(self):
-        """Test session summary calculation"""
-        # Add multiple requests with different providers
+    def test_session_summary(self):
+        """Test session summary generation with multiple models"""
         responses = [
             APIResponse(
                 content="Test 1",
-                token_usage=TokenUsage(100, 50, 150, 20),
+                token_usage=TokenUsage(100, 50, 150, None),
                 cost=0.1,
                 thinking_time=1.0,
-                provider="openai",
-                model="o1"
+                provider="chutes",
+                model="deepseek-ai/DeepSeek-R1"
             ),
             APIResponse(
                 content="Test 2",
                 token_usage=TokenUsage(200, 100, 300, None),
                 cost=0.2,
                 thinking_time=2.0,
-                provider="anthropic",
-                model="claude-3-sonnet-20240229"
+                provider="chutes",
+                model="Qwen/Qwen2.5-72B-Instruct"
             )
         ]
         
@@ -187,9 +115,14 @@ class TestTokenTracker(unittest.TestCase):
         self.assertEqual(summary["total_thinking_time"], 3.0)
         
         # Verify provider stats
-        self.assertEqual(len(summary["provider_stats"]), 2)
-        self.assertEqual(summary["provider_stats"]["openai"]["requests"], 1)
-        self.assertEqual(summary["provider_stats"]["anthropic"]["requests"], 1)
+        self.assertEqual(len(summary["provider_stats"]), 1)  # Only "chutes" provider
+        chutes_stats = summary["provider_stats"]["chutes"]
+        self.assertEqual(chutes_stats["requests"], 2)
+        
+        # Verify model stats
+        self.assertEqual(len(chutes_stats["models"]), 2)
+        self.assertTrue("deepseek-ai/DeepSeek-R1" in chutes_stats["models"])
+        self.assertTrue("Qwen/Qwen2.5-72B-Instruct" in chutes_stats["models"])
 
     def test_global_token_tracker(self):
         """Test global token tracker instance management"""
@@ -210,5 +143,37 @@ class TestTokenTracker(unittest.TestCase):
         tracker4 = get_token_tracker(logs_dir=self.test_logs_dir)
         self.assertIs(tracker3, tracker4)
 
-if __name__ == "__main__":
+    def test_log_file_rotation(self):
+        """Test log file rotation based on date"""
+        # Create responses on different dates
+        responses = [
+            APIResponse(
+                content=f"Test {i}",
+                token_usage=TokenUsage(100, 50, 150, None),
+                cost=0.1,
+                thinking_time=1.0,
+                provider="chutes",
+                model="deepseek-ai/DeepSeek-R1"
+            ) for i in range(2)
+        ]
+        
+        # Mock different dates for each response
+        dates = [
+            datetime(2024, 3, 1),
+            datetime(2024, 3, 2)
+        ]
+        
+        for response, date in zip(responses, dates):
+            with patch('datetime.datetime') as mock_datetime:
+                mock_datetime.now.return_value = date
+                self.tracker.track_request(response)
+        
+        # Verify log files
+        log_files = sorted(os.listdir(self.test_logs_dir))
+        self.assertEqual(len(log_files), 2)
+        self.assertTrue(all(f.endswith('.json') for f in log_files))
+        self.assertTrue('2024-03-01' in log_files[0])
+        self.assertTrue('2024-03-02' in log_files[1])
+
+if __name__ == '__main__':
     unittest.main() 

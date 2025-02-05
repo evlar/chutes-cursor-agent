@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+
+import unittest
+import os
+from unittest.mock import patch, MagicMock
+from pathlib import Path
+import sys
+import json
+
+# Add the parent directory to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from tests.tools_chutes.plan_exec_llm_chutes import (
+    load_environment, read_plan_status, read_file_content, query_llm
+)
+
+STATUS_FILE = '.cursorrules_chutes'
+
+class TestPlanExecLLM(unittest.TestCase):
+    def setUp(self):
+        """Set up test fixtures"""
+        self.original_env = dict(os.environ)
+        os.environ['CHUTES_API_TOKEN'] = 'test_token'
+        
+        self.test_env_content = """
+CHUTES_API_TOKEN=test_token
+"""
+        self.test_plan_content = """
+# Multi-Agent Scratchpad
+Test content
+"""
+        # Create temporary test files
+        with open('.env.test', 'w') as f:
+            f.write(self.test_env_content)
+        with open(f'{STATUS_FILE}.test', 'w') as f:
+            f.write(self.test_plan_content)
+
+    def tearDown(self):
+        """Clean up test fixtures"""
+        os.environ.clear()
+        os.environ.update(self.original_env)
+        
+        for file in ['.env.test', f'{STATUS_FILE}.test']:
+            if os.path.exists(file):
+                os.remove(file)
+
+    @patch('tools.plan_exec_llm_chutes.load_dotenv')
+    def test_load_environment(self, mock_load_dotenv):
+        """Test environment loading"""
+        load_environment()
+        mock_load_dotenv.assert_called()
+
+    def test_read_plan_status(self):
+        """Test reading plan status"""
+        with patch('tools.plan_exec_llm_chutes.STATUS_FILE', f'{STATUS_FILE}.test'):
+            content = read_plan_status()
+            self.assertIn('# Multi-Agent Scratchpad', content)
+            self.assertIn('Test content', content)
+
+    def test_read_file_content(self):
+        """Test reading file content"""
+        content = read_file_content('.env.test')
+        self.assertIn('CHUTES_API_TOKEN=test_token', content)
+
+        content = read_file_content('nonexistent_file.txt')
+        self.assertIsNone(content)
+
+    @patch('requests.post')
+    def test_query_llm(self, mock_post):
+        """Test LLM querying"""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "choices": [{
+                "message": {
+                    "content": "Test response"
+                }
+            }],
+            "usage": {
+                "prompt_tokens": 10,
+                "completion_tokens": 5,
+                "total_tokens": 15
+            }
+        }
+        mock_post.return_value = mock_response
+
+        # Test with various combinations of parameters
+        response = query_llm("Test plan", "Test prompt", "Test file content")
+        self.assertEqual(response, "Test response")
+
+        response = query_llm("Test plan", "Test prompt")
+        self.assertEqual(response, "Test response")
+
+        response = query_llm("Test plan")
+        self.assertEqual(response, "Test response")
+
+        # Verify the Chutes API was called with correct parameters
+        mock_post.assert_called()
+        call_args = mock_post.call_args
+        self.assertTrue('https://chutes-deepseek-ai-deepseek-r1.chutes.ai/v1/chat/completions' 
+                       in call_args[0][0])
+        self.assertEqual(call_args[1]['headers']['Authorization'], 
+                        'Bearer test_token')
+        
+        # Verify message structure
+        sent_data = json.loads(call_args[1]['data'])
+        self.assertIn('messages', sent_data)
+        self.assertEqual(sent_data['model'], 'deepseek-ai/DeepSeek-R1')
+        self.assertEqual(sent_data['temperature'], 0.3)
+
+if __name__ == '__main__':
+    unittest.main() 
