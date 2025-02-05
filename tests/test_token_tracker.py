@@ -5,9 +5,10 @@ import os
 import json
 import shutil
 from datetime import datetime
-from tools.token_tracker import TokenUsage, APIResponse, TokenTracker, get_token_tracker
+from unittest.mock import patch, MagicMock
+from tools.token_tracker import TokenUsage, APIResponse, RequestTracker, get_request_tracker
 
-class TestTokenTracker(unittest.TestCase):
+class TestRequestTracker(unittest.TestCase):
     def setUp(self):
         """Set up test environment"""
         self.test_logs_dir = "test_logs"
@@ -15,7 +16,7 @@ class TestTokenTracker(unittest.TestCase):
             shutil.rmtree(self.test_logs_dir)
         os.makedirs(self.test_logs_dir)
         
-        self.tracker = TokenTracker("test-session", logs_dir=self.test_logs_dir)
+        self.tracker = RequestTracker("test-session", logs_dir=self.test_logs_dir)
 
     def tearDown(self):
         """Clean up test environment"""
@@ -36,7 +37,6 @@ class TestTokenTracker(unittest.TestCase):
         response = APIResponse(
             content="Test response",
             token_usage=usage,
-            cost=0.1,
             thinking_time=1.0,
             provider="chutes",
             model="deepseek-ai/DeepSeek-R1"
@@ -44,7 +44,6 @@ class TestTokenTracker(unittest.TestCase):
         
         self.assertEqual(response.content, "Test response")
         self.assertEqual(response.token_usage, usage)
-        self.assertEqual(response.cost, 0.1)
         self.assertEqual(response.thinking_time, 1.0)
         self.assertEqual(response.provider, "chutes")
         self.assertEqual(response.model, "deepseek-ai/DeepSeek-R1")
@@ -54,13 +53,15 @@ class TestTokenTracker(unittest.TestCase):
         response = APIResponse(
             content="Test response",
             token_usage=TokenUsage(100, 50, 150, None),
-            cost=0.1,
             thinking_time=1.0,
             provider="chutes",
             model="deepseek-ai/DeepSeek-R1"
         )
         
-        self.tracker.track_request(response)
+        # Mock the current date to ensure consistent log file names
+        with patch('datetime.datetime') as mock_datetime:
+            mock_datetime.now.return_value = datetime(2024, 3, 1)
+            self.tracker.track_request(response)
         
         # Verify log file exists and contains correct data
         log_files = os.listdir(self.test_logs_dir)
@@ -68,15 +69,15 @@ class TestTokenTracker(unittest.TestCase):
         
         log_path = os.path.join(self.test_logs_dir, log_files[0])
         with open(log_path, 'r') as f:
-            log_data = json.load(f)
+            data = json.load(f)
             
-        self.assertEqual(len(log_data), 1)
-        entry = log_data[0]
+        self.assertIn('requests', data)
+        self.assertEqual(len(data['requests']), 1)
+        entry = data['requests'][0]
         self.assertEqual(entry["content"], "Test response")
         self.assertEqual(entry["token_usage"]["prompt_tokens"], 100)
         self.assertEqual(entry["token_usage"]["completion_tokens"], 50)
         self.assertEqual(entry["token_usage"]["total_tokens"], 150)
-        self.assertEqual(entry["cost"], 0.1)
         self.assertEqual(entry["provider"], "chutes")
         self.assertEqual(entry["model"], "deepseek-ai/DeepSeek-R1")
 
@@ -86,7 +87,6 @@ class TestTokenTracker(unittest.TestCase):
             APIResponse(
                 content="Test 1",
                 token_usage=TokenUsage(100, 50, 150, None),
-                cost=0.1,
                 thinking_time=1.0,
                 provider="chutes",
                 model="deepseek-ai/DeepSeek-R1"
@@ -94,7 +94,6 @@ class TestTokenTracker(unittest.TestCase):
             APIResponse(
                 content="Test 2",
                 token_usage=TokenUsage(200, 100, 300, None),
-                cost=0.2,
                 thinking_time=2.0,
                 provider="chutes",
                 model="Qwen/Qwen2.5-72B-Instruct"
@@ -111,7 +110,6 @@ class TestTokenTracker(unittest.TestCase):
         self.assertEqual(summary["total_prompt_tokens"], 300)
         self.assertEqual(summary["total_completion_tokens"], 150)
         self.assertEqual(summary["total_tokens"], 450)
-        self.assertAlmostEqual(summary["total_cost"], 0.3, places=6)
         self.assertEqual(summary["total_thinking_time"], 3.0)
         
         # Verify provider stats
@@ -124,23 +122,23 @@ class TestTokenTracker(unittest.TestCase):
         self.assertTrue("deepseek-ai/DeepSeek-R1" in chutes_stats["models"])
         self.assertTrue("Qwen/Qwen2.5-72B-Instruct" in chutes_stats["models"])
 
-    def test_global_token_tracker(self):
-        """Test global token tracker instance management"""
+    def test_global_request_tracker(self):
+        """Test global request tracker instance management"""
         # Get initial tracker with specific session ID
-        tracker1 = get_token_tracker("test-global-1", logs_dir=self.test_logs_dir)
+        tracker1 = get_request_tracker("test-global-1", logs_dir=self.test_logs_dir)
         self.assertIsNotNone(tracker1)
         
         # Get another tracker without session ID - should be the same instance
-        tracker2 = get_token_tracker(logs_dir=self.test_logs_dir)
+        tracker2 = get_request_tracker(logs_dir=self.test_logs_dir)
         self.assertIs(tracker1, tracker2)
         
         # Get tracker with different session ID - should be new instance
-        tracker3 = get_token_tracker("test-global-2", logs_dir=self.test_logs_dir)
+        tracker3 = get_request_tracker("test-global-2", logs_dir=self.test_logs_dir)
         self.assertIsNot(tracker1, tracker3)
         self.assertEqual(tracker3.session_id, "test-global-2")
         
         # Get tracker without session ID - should reuse the latest instance
-        tracker4 = get_token_tracker(logs_dir=self.test_logs_dir)
+        tracker4 = get_request_tracker(logs_dir=self.test_logs_dir)
         self.assertIs(tracker3, tracker4)
 
     def test_log_file_rotation(self):
@@ -150,7 +148,6 @@ class TestTokenTracker(unittest.TestCase):
             APIResponse(
                 content=f"Test {i}",
                 token_usage=TokenUsage(100, 50, 150, None),
-                cost=0.1,
                 thinking_time=1.0,
                 provider="chutes",
                 model="deepseek-ai/DeepSeek-R1"
@@ -164,8 +161,7 @@ class TestTokenTracker(unittest.TestCase):
         ]
         
         for response, date in zip(responses, dates):
-            with patch('datetime.datetime') as mock_datetime:
-                mock_datetime.now.return_value = date
+            with patch.object(self.tracker, '_get_current_date', return_value=date.strftime("%Y-%m-%d")):
                 self.tracker.track_request(response)
         
         # Verify log files
