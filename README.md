@@ -1,6 +1,6 @@
 # Chutes Cursor Agent: Transform Cursor into a Devin-like AI Assistant
 
-This repository provides everything needed to enhance your Cursor or Windsurf IDE with advanced agentic AI capabilities — similar to Devin—leveraging Chutes.ai's powerful model ecosystem. In under a minute, you'll gain:
+This repository provides everything needed to enhance your Cursor or Windsurf IDE with advanced agentic AI capabilities — similar to Devin—leveraging [Chutes.ai](https://chutes.ai)'s powerful model ecosystem. In under a minute, you'll gain:
 
 * Automated planning and self-evolution using DeepSeek's advanced models
 * Extended tool usage, including web browsing, search engine queries, and LLM-driven text/image analysis
@@ -9,11 +9,11 @@ This repository provides everything needed to enhance your Cursor or Windsurf ID
 ## Prerequisites
 
 Before you begin, you'll need:
-1. A Chutes.ai account with API access
-2. A Bittensor wallet and hotkey (required for Chutes.ai authentication)
+1. A [Chutes.ai](https://chutes.ai) account with API access
+2. A Bittensor wallet and hotkey (required for [Chutes.ai](https://chutes.ai) authentication)
 3. Python 3.10+ installed on your system
 
-If you don't have a Chutes.ai account:
+If you don't have a [Chutes.ai](https://chutes.ai) account:
 1. Visit [chutes.ai](https://chutes.ai) to create an account
 2. Create an API key through the website dashboard
    - Or use the CLI: `chutes keys create --name cursor-key`
@@ -28,7 +28,7 @@ chutes register
 
 ## Why This Matters
 
-While Devin impressed many with its capabilities, you can achieve similar functionality using Chutes.ai's model ecosystem. By customizing the `.cursorrules` file (or `.windsurfrules` for Windsurf users) and accompanying Python scripts, you'll unlock advanced features inside your IDE using state-of-the-art models.
+While Devin impressed many with its capabilities, you can achieve similar functionality using [Chutes.ai](https://chutes.ai)'s model ecosystem. By customizing the `.cursorrules` file (or `.windsurfrules` for Windsurf users) and accompanying Python scripts, you'll unlock advanced features inside your IDE using state-of-the-art models.
 
 ## Key Highlights
 
