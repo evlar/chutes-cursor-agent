@@ -1,4 +1,4 @@
-# Transform your Cursor into a Devin-like AI Assistant with Chutes.ai Integration
+# Chutes Cursor Agent: Transform Cursor into a Devin-like AI Assistant
 
 This repository provides everything needed to enhance your Cursor or Windsurf IDE with advanced agentic AI capabilities — similar to Devin—leveraging Chutes.ai's powerful model ecosystem. In under a minute, you'll gain:
 
@@ -40,6 +40,16 @@ While Devin impressed many with its capabilities, you can achieve similar functi
 4. Self-Evolution
 
    The system learns from corrections and updates its "lessons learned" in .cursorrules_chutes.
+
+## Installation
+
+Clone this repository:
+```bash
+git clone https://github.com/evlar/chutes-cursor-agent.git
+cd chutes-cursor-agent
+```
+
+Then follow the setup instructions below.
 
 ## Usage
 
@@ -138,4 +148,4 @@ The system includes built-in cost tracking and optimization:
 
 ## License
 
-MIT License 
+MIT License
