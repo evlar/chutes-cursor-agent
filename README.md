@@ -6,30 +6,52 @@ This repository provides everything needed to enhance your Cursor or Windsurf ID
 * Extended tool usage, including web browsing, search engine queries, and LLM-driven text/image analysis
 * Multi-agent collaboration, with DeepSeek-R1 doing the planning, and specialized models for execution
 
+## Prerequisites
+
+Before you begin, you'll need:
+1. A Chutes.ai account with API access
+2. A Bittensor wallet and hotkey (required for Chutes.ai authentication)
+3. Python 3.10+ installed on your system
+
+If you don't have a Chutes.ai account:
+1. Visit [chutes.ai](https://chutes.ai) to create an account
+2. Create an API key through the website dashboard
+   - Or use the CLI: `chutes keys create --name cursor-key`
+
+For experienced users who prefer manual wallet setup:
+```bash
+pip install bittensor==5.5.1  # Newer versions require Rust
+btcli wallet new_coldkey --n_words 24 --wallet.name chutes-user
+btcli wallet new_hotkey --wallet.name chutes-user --n_words 24 --wallet.hotkey chutes-user-hotkey
+chutes register
+```
+
 ## Why This Matters
 
-While Devin impressed many with its capabilities, you can achieve similar functionality using Chutes.ai's model ecosystem. By customizing the .cursorrules_chutes file and accompanying Python scripts, you'll unlock advanced features inside Cursor using state-of-the-art models.
+While Devin impressed many with its capabilities, you can achieve similar functionality using Chutes.ai's model ecosystem. By customizing the `.cursorrules` file (or `.windsurfrules` for Windsurf users) and accompanying Python scripts, you'll unlock advanced features inside your IDE using state-of-the-art models.
 
 ## Key Highlights
 
-1. Easy Setup
+1. Multi-Agent Architecture
    
-   Copy the provided config files into your project folder. Cursor users need the .cursorrules_chutes file. Setup takes about a minute.
+   The system operates with two specialized agents:
+   - **Planner** (DeepSeek-R1): Handles high-level analysis, task breakdown, and strategic planning
+   - **Executor**: Implements specific tasks using the most appropriate specialized models
 
 2. Optimized Model Selection
    
-   The system includes intelligent model selection based on task complexity:
-   - Quick Q&A: Uses FLUX.1-schnell for fast, cost-effective responses
-   - Technical expertise: Leverages DeepSeek-R1 for specialized knowledge
-   - Code generation: Uses Qwen2.5-Coder-32B for optimized programming tasks
-   - Complex tasks: Defaults to DeepSeek-R1 or Qwen2.5-72B for advanced reasoning
+   Intelligent model routing based on task type:
+   - **Planning & Complex Reasoning**: DeepSeek-R1
+   - **Code Generation**: Qwen2.5-Coder-32B-Instruct
+   - **Quick Tasks**: FLUX.1-schnell
+   - **UI/UX Design**: UI-TARS-72B-DPO
 
 3. Extended Toolset
 
    Includes:
    
-   * Web scraping (Playwright)
-   * Search engine integration (DuckDuckGo)
+   * Web scraping with Playwright
+   * DuckDuckGo search integration
    * LLM-powered analysis with Chutes.ai models:
      - DeepSeek-R1 (Primary reasoning model)
      - Qwen2.5-72B-Instruct (General tasks)
@@ -39,7 +61,7 @@ While Devin impressed many with its capabilities, you can achieve similar functi
 
 4. Self-Evolution
 
-   The system learns from corrections and updates its "lessons learned" in .cursorrules_chutes.
+   The system maintains a "Lessons" section to continuously improve its performance based on user interactions and corrections.
 
 ## Installation
 
@@ -54,8 +76,8 @@ Then follow the setup instructions below.
 ## Usage
 
 1. Copy all Chutes-specific files from this repository to your project folder
-2. For Cursor users: The `.cursorrules_chutes` file will be automatically loaded
-3. For Windsurf users: Use both `.windsurfrules_chutes` and `scratchpad_chutes.md`
+2. For Cursor users: The `.cursorrules` file will be automatically loaded
+3. For Windsurf users: Use both `.windsurfrules` and `scratchpad_chutes.md`
 
 ## Multi-Agent Support
 
@@ -63,89 +85,38 @@ This project leverages Chutes.ai's model ecosystem for a powerful multi-agent sy
 
 ### Architecture
 
-- **Planner** (powered by DeepSeek-R1): Handles high-level analysis and strategic planning
-- **Executor** (powered by specialized models): Implements specific tasks using the most appropriate model
+The system operates with two primary agents:
 
-### Key Benefits
+1. **Planner (DeepSeek-R1)**
+   - High-level analysis and strategic planning
+   - Task breakdown and success criteria definition
+   - Progress evaluation and milestone tracking
+   - Invoked via `tools/plan_exec_llm_chutes.py`
 
-1. **Enhanced Task Quality**
-   - Strategic planning with DeepSeek-R1's advanced reasoning
-   - Specialized execution with task-appropriate models
-   - Continuous validation and refinement
+2. **Executor (Specialized Models)**
+   - Task implementation and code generation
+   - Testing and validation
+   - Real-time feedback and progress tracking
+   - Uses task-appropriate models from the ecosystem
 
-2. **Improved Problem Solving**
-   - Comprehensive test strategies from the Planner
-   - Optimized execution with specialized models
-   - Efficient feedback loop between agents
+### Workflow
+
+1. **Task Initialization**
+   - Planner analyzes requirements and creates task breakdown
+   - Success criteria are defined
+   - Initial strategy is formulated
+
+2. **Execution Phase**
+   - Executor implements tasks using specialized models
+   - Continuous progress tracking
+   - Real-time feedback loop with Planner
+
+3. **Quality Assurance**
+   - Automated testing and validation
+   - Performance metrics tracking
+   - Lessons learned documentation
 
 ## Setup
 
 1. Create Python virtual environment:
-```bash
-python3 -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\activate
 ```
-
-2. Configure environment variables:
-```bash
-cp .env.example .env
-
-# Edit .env with your API key:
-# Required:
-# - CHUTES_API_TOKEN: Your Chutes.ai API key for accessing all models
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-python -m playwright install chromium
-```
-
-## Tools Included
-
-- Web scraping with JavaScript support
-- Search engine integration
-- LLM-powered text and image analysis
-- Process planning and self-reflection capabilities
-
-## Testing
-
-Run the test suite:
-
-```bash
-source venv/bin/activate  # On Windows: .\venv\Scripts\activate
-PYTHONPATH=. pytest -v tests/
-```
-
-The test suite includes:
-- Search engine tests
-- Web scraper tests
-- Chutes.ai model integration tests
-- Token tracking and cost analysis tests
-
-## Important Notes
-
-### Chutes.ai Integration
-The system uses Chutes.ai to access various AI models:
-- Authentication via CHUTES_API_TOKEN
-- Automatic model selection based on task requirements
-- Cost-effective routing between models
-
-### Model Selection Logic
-Sophisticated model selection based on:
-1. Task complexity and token length
-2. Required expertise (general, coding, UI/UX)
-3. Response time requirements
-4. Cost optimization
-
-The selection is automatic but can be manually overridden when needed.
-
-### Cost Management
-The system includes built-in cost tracking and optimization:
-- Automatic usage of cost-effective models for simple tasks
-- Detailed token and cost tracking per session
-- Model-specific pricing considerations
-
-## License
-
-MIT License
