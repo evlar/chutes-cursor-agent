@@ -1,0 +1,216 @@
+{
+  "requests": [
+    {
+      "timestamp": 1738793890.49723,
+      "content": "Test response",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.00017571449279785156,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738793890.5006874,
+      "content": "Test response",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.00020456314086914062,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738793928.8446689,
+      "content": "<think>\nOkay, the user just told me to say \"test\". Let me make sure I understand correctly. They want me to respond with the word \"test\". Alright, that seems straightforward. I should check if there's any hidden context or if they might be testing how I respond to simple commands. But it looks like a direct request. I'll go ahead and reply with \"Test\". Keeping it simple and to the point.\n</think>\n\nTest",
+      "token_usage": {
+        "prompt_tokens": 7,
+        "completion_tokens": 93,
+        "total_tokens": 100,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 38.342161417007446,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738793929.7969632,
+      "content": "The webpage has a blue background and the title is 'agentic.ai test page'",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.00016808509826660156,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738793988.2318864,
+      "content": "Test response",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.00017833709716796875,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738793988.235264,
+      "content": "Test response",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.00019788742065429688,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738793991.4690683,
+      "content": "<think>\nOkay, the user wants me to say \"test\". Let me check if there's any deeper meaning here. Probably just testing if the AI responds correctly. The query is straightforward. I should respond with \"test\" as requested. No need for extra information since the instruction is simple. Alright, time to reply.\n</think>\n\ntest",
+      "token_usage": {
+        "prompt_tokens": 7,
+        "completion_tokens": 71,
+        "total_tokens": 78,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 3.2319347858428955,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738793992.050082,
+      "content": "The webpage has a blue background and the title is 'agentic.ai test page'",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.00018334388732910156,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738794016.7828925,
+      "content": "Test response",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.0001735687255859375,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738794016.786555,
+      "content": "Test response",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.00019097328186035156,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738794043.1122875,
+      "content": "<think>\nOkay, the user said \"Say 'test'\". Let me make sure I understand what they want.\n\nThey probably just want me to respond with the word \"test\" in quotes. Maybe they're checking if I can follow simple instructions or testing how I respond. Let me think if there's any other possible interpretation. Could they be asking for a test of some functionality? Like testing a feature? But the phrase \"Say 'test'\" is pretty straightforward. The quotes around 'test' suggest they want the exact word said back.\n\nI should respond by just saying \"test\" as instructed. No need to complicate it. Maybe add a confirmation like \"Is there anything else I can assist you with?\" but the main response should be \"test\". \n\nWait, do they want the word test in quotes in the response? The original message has \"test\" in single quotes. Should I use single or double quotes in my response? The user used single, so I'll match that for consistency. So my reply should be 'test'.\n\nLet me double-check. User input: \"Say 'test'\". Desired output: 'test'. Yep, that's it. No hidden meaning here. Just a straightforward request. Alright, time to respond.\n</think>\n\n'test'",
+      "token_usage": {
+        "prompt_tokens": 7,
+        "completion_tokens": 261,
+        "total_tokens": 268,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 26.32370638847351,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738794043.781505,
+      "content": "The webpage has a blue background and the title is 'agentic.ai test page'",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.00017070770263671875,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738794085.484167,
+      "content": "Test response",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.00017213821411132812,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738794085.487795,
+      "content": "Test response",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.00018787384033203125,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738794092.0375383,
+      "content": "<think>\nOkay, the user wants me to say \"test\". Let me confirm what they're asking for. They wrote \"Say 'test'\", so the straightforward response would be to just type \"test\". But maybe they want to check if the system is working or if there's a specific format needed. Sometimes people use \"test\" to see if a bot is responsive. I should keep it simple and just reply with \"test\" as requested. No need for extra explanation unless they ask for more. Let me make sure there's no hidden instruction here. Nope, seems direct. Alright, responding with \"test\" should suffice.\n</think>\n\ntest",
+      "token_usage": {
+        "prompt_tokens": 7,
+        "completion_tokens": 135,
+        "total_tokens": 142,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 6.547814846038818,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    },
+    {
+      "timestamp": 1738794092.9395325,
+      "content": "The webpage has a blue background and the title is 'agentic.ai test page'",
+      "token_usage": {
+        "prompt_tokens": 10,
+        "completion_tokens": 5,
+        "total_tokens": 15,
+        "reasoning_tokens": null
+      },
+      "thinking_time": 0.0007417201995849609,
+      "provider": "chutes",
+      "model": "deepseek-ai/DeepSeek-R1"
+    }
+  ],
+  "metadata": {
+    "session_id": "2025-02-05",
+    "start_time": 1738793988.2316308
+  }
+}

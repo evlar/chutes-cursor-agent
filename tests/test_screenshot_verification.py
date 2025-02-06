@@ -4,7 +4,7 @@ import os
 import pytest
 from unittest.mock import patch, MagicMock, mock_open, AsyncMock
 from tools.screenshot_utils import take_screenshot_sync, take_screenshot
-from tests.tools_chutes.llm_api_chutes import query_llm
+from tools.llm_api import query_llm
 from tools.token_tracker import TokenUsage
 
 class TestScreenshotVerification:
@@ -80,7 +80,12 @@ class TestScreenshotVerification:
                 "message": {
                     "content": "The webpage has a blue background and the title is 'agentic.ai test page'"
                 }
-            }]
+            }],
+            "usage": {
+                "prompt_tokens": 10,
+                "completion_tokens": 5,
+                "total_tokens": 15
+            }
         }
         mock_response.status_code = 200
         

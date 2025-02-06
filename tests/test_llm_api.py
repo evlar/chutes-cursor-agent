@@ -5,7 +5,7 @@ import os
 from unittest.mock import patch, MagicMock
 import io
 import requests
-from tests.tools_chutes.llm_api_chutes import load_environment, query_llm
+from tools.llm_api import load_environment, query_llm
 from tools.token_tracker import TokenUsage, APIResponse
 
 class TestEnvironmentLoading(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestEnvironmentLoading(unittest.TestCase):
         os.environ.update(self.original_env)
 
     @patch('pathlib.Path.exists')
-    @patch('tools.llm_api_chutes.load_dotenv')
+    @patch('tools.llm_api.load_dotenv')
     @patch('builtins.open')
     def test_environment_loading_precedence(self, mock_open, mock_load_dotenv, mock_exists):
         mock_exists.return_value = True
@@ -89,16 +89,28 @@ class TestLLMAPI(unittest.TestCase):
     @patch('requests.post')
     def test_query_llm_with_image(self, mock_post):
         mock_post.return_value = self.mock_response
-        response = query_llm("Describe image", model="deepseek-ai/DeepSeek-R1", 
-                           image_path="test.jpg")
-        self.assertEqual(response, "Test response")
         
-        # Verify image was included in request
-        call_args = mock_post.call_args
-        self.assertIn('messages', call_args[1]['json'])
-        messages = call_args[1]['json']['messages']
-        self.assertTrue(any('image' in msg.get('content', [{}])[0] 
-                          for msg in messages))
+        # Create a temporary test image file
+        with open("test.jpg", "wb") as f:
+            f.write(b"fake image data")
+        
+        try:
+            response = query_llm("Describe image", model="deepseek-ai/DeepSeek-R1", 
+                               image_path="test.jpg")
+            self.assertEqual(response, "Test response")
+            
+            # Verify image was included in request
+            call_args = mock_post.call_args
+            self.assertIn('messages', call_args[1]['json'])
+            messages = call_args[1]['json']['messages']
+            self.assertTrue(any(
+                any(content.get('type') == 'image_url' for content in msg.get('content', []))
+                for msg in messages
+            ))
+        finally:
+            # Clean up the test image file
+            if os.path.exists("test.jpg"):
+                os.remove("test.jpg")
 
     @patch('requests.post')
     def test_query_error_handling(self, mock_post):

@@ -2,7 +2,8 @@
 
 import unittest
 import os
-from tests.tools_chutes.llm_api_chutes import query_llm, load_environment
+from tools.llm_api import query_llm, load_environment
+from tools.token_tracker import TokenUsage, APIResponse
 import pytest
 
 def requires_chutes(func):

@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+
 import os
 import pytest
-from tests.tools_chutes.llm_api_chutes import load_environment
+from tools.llm_api import load_environment
 
 # Load environment at module level
 load_environment()

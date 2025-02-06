@@ -65,6 +65,20 @@ While Devin impressed many with its capabilities, you can achieve similar functi
 
 ## Installation
 
+You have two ways to get started:
+
+### Option 1: Using Cookiecutter (Recommended)
+
+```bash
+# Install cookiecutter if you haven't
+pip install cookiecutter
+
+# Create a new project
+cookiecutter gh:evlar/chutes-cursor-agent --checkout multi-agent
+```
+
+### Option 2: Manual Setup
+
 Clone this repository:
 ```bash
 git clone https://github.com/evlar/chutes-cursor-agent.git
@@ -73,11 +87,63 @@ cd chutes-cursor-agent
 
 Then follow the setup instructions below.
 
+## Setup
+
+1. Create Python virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+```
+
+2. Configure environment variables:
+```bash
+cp .env.example.chutes .env
+
+# Edit .env with your API key:
+# Required:
+# - CHUTES_API_TOKEN: Your Chutes.ai API key (format: cpk_...)
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+python -m playwright install chromium  # Required for web scraping features
+```
+
+4. Verify Chutes.ai Connection:
+```bash
+# Test your API key
+curl -s https://api.chutes.ai/users/me -H 'authorization: YOUR_API_KEY'
+```
+
+## Testing
+
+To ensure everything is working correctly:
+
+1. Activate the virtual environment if not already active:
+```bash
+source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+```
+
+2. Run the test suite:
+```bash
+PYTHONPATH=. pytest -v tests/
+```
+
+The test suite includes:
+- Search engine integration tests
+- Web scraper functionality tests
+- Chutes.ai model integration tests
+- Token tracking and cost analysis tests
+- Screenshot verification tests
+
+Note: For screenshot verification features, Playwright browsers will be installed automatically when you first use the feature.
+
 ## Usage
 
 1. Copy all Chutes-specific files from this repository to your project folder
 2. For Cursor users: The `.cursorrules` file will be automatically loaded
-3. For Windsurf users: Use both `.windsurfrules` and `scratchpad_chutes.md`
+3. For Windsurf users: Use both `.windsurfrules` and `scratchpad.md`
 
 ## Multi-Agent Support
 
