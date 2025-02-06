@@ -72,8 +72,8 @@ Available Models:
    - When: System design, architecture decisions, complex analysis
    - Example: "Design a distributed system architecture"
 
-2. **Code Generation**
-   - Use: `Qwen/Qwen2.5-Coder-32B-Instruct`
+2. **Code Generation & Analysis**
+   - Use: `deepseek-ai/DeepSeek-R1`
    - When: Writing code, debugging, technical documentation
    - Example: "Implement a binary search tree in Python"
 
@@ -107,7 +107,7 @@ venv/bin/python tools/llm_api_chutes.py --prompt "Analyze this image" --model "d
 # Lessons
 
 ## System Learned
-- DeepSeek-R1 excels at planning and complex reasoning tasks
+- DeepSeek-R1 excels at both planning and coding tasks
 - FLUX models provide fastest response times but may sacrifice some accuracy
 - Qwen Coder models are optimal for programming tasks
 - UI-TARS specializes in interface and user experience design
