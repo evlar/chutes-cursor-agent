@@ -46,6 +46,12 @@ Access Chutes.ai's LLM capabilities via:
 venv/bin/python tools/llm_api_chutes.py --prompt "Your prompt" --model "model_name"
 ```
 
+For detailed model selection guidance, refer to `models_guide.md`. This comprehensive guide includes:
+- Detailed model capabilities and specifications
+- Decision matrices for different task types
+- Best practices and selection flowcharts
+- Performance monitoring recommendations
+
 Available Models:
 
 1. **Base Models**
@@ -67,30 +73,32 @@ Available Models:
 
 ## Model Selection Guidelines
 
+See `models_guide.md` for comprehensive selection criteria. Key guidelines:
+
 1. **Planning & Complex Reasoning**
-   - Use: `deepseek-ai/DeepSeek-R1`
+   - Primary: `deepseek-ai/DeepSeek-R1`
    - When: System design, architecture decisions, complex analysis
-   - Example: "Design a distributed system architecture"
+   - See models_guide.md "Decision Matrix > System Planning & Architecture"
 
 2. **Code Generation & Analysis**
-   - Use: `deepseek-ai/DeepSeek-R1`
-   - When: Writing code, debugging, technical documentation
-   - Example: "Implement a binary search tree in Python"
+   - Use model based on task complexity (refer to models_guide.md "Decision Matrix > Code Generation")
+   - Quick tasks: FLUX models
+   - Complex tasks: DeepSeek-R1
+   - Documentation: Qwen2.5-Coder-32B-Instruct
 
-3. **Quick Tasks**
-   - Use: `FLUX.1-schnell`
-   - When: Simple queries, fast responses needed
-   - Example: "What is the syntax for a Python list comprehension?"
+3. **UI/UX Tasks**
+   - Primary: `bytedance-research/UI-TARS-72B-DPO`
+   - See models_guide.md "Domain-Specific Models" section
 
-4. **UI/UX Tasks**
-   - Use: `bytedance-research/UI-TARS-72B-DPO`
-   - When: Interface design, user experience flows
-   - Example: "Design a user registration flow"
+4. **Speed-Critical Tasks**
+   - Follow the Speed Priority flowchart in models_guide.md
+   - Default to FLUX models for quick responses
 
 5. **Fallback Strategy**
-   - Primary: `deepseek-ai/DeepSeek-R1`
-   - Secondary: `Qwen/Qwen2.5-72B-Instruct`
-   - Final: Try different model based on task type
+   - Follow the "Best Practices > Fallback Strategy" in models_guide.md
+   - Primary: DeepSeek-R1
+   - Secondary: Qwen2.5-72B-Instruct
+   - Fast Fallback: FLUX.1-schnell
 
 ## Web Tools
 
@@ -115,4 +123,4 @@ venv/bin/python tools/llm_api_chutes.py --prompt "Analyze this image" --model "d
 
 # Multi-Agent Scratchpad
 
-[Content will be populated based on current task] 
+[Content will be populated based on current task]
