@@ -42,7 +42,7 @@ While Devin impressed many with its capabilities, you can achieve similar functi
    
    Intelligent model routing based on task type:
    - **Planning & Complex Reasoning**: DeepSeek-R1
-   - **Code Generation**: Qwen2.5-Coder-32B-Instruct
+   - **Code Generation & Analysis**: DeepSeek-R1
    - **Quick Tasks**: FLUX.1-schnell
    - **UI/UX Design**: UI-TARS-72B-DPO
 
@@ -53,9 +53,8 @@ While Devin impressed many with its capabilities, you can achieve similar functi
    * Web scraping with Playwright
    * DuckDuckGo search integration
    * LLM-powered analysis with Chutes.ai models:
-     - DeepSeek-R1 (Primary reasoning model)
+     - DeepSeek-R1 (Primary model for reasoning and coding)
      - Qwen2.5-72B-Instruct (General tasks)
-     - Qwen2.5-Coder-32B-Instruct (Code-specific tasks)
      - FLUX.1-schnell (Fast responses)
      - UI-TARS-72B (UI/UX specific tasks)
 
